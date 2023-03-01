@@ -13,16 +13,35 @@ router.get('/:id', (req, res) => {
   res.json(books.filter((ele) => ele.id === parseInt(id)));
 });
 
+router.use('/', (req, res, next) => {
+  if (!req.is('application/json')) {
+    res.status(400).json({message: 'Request content not formatted correctly'})
+  } else {
+    next();
+  }
+});
+
 router.post('/', (req, res) => {
   const body = req.body;
   console.log(body);
-  books.push(body);
-  res.json({ message: 'The book has been added' });
+
+  if (!body.name || !body.author) {
+    res.status(400).json({message: 'One or more required fields are empty'})
+  } else {
+    let book = {
+      id: books.length + 1,
+      name: body.name,
+      author: body.author
+    }
+    books.push(book);
+    res.json({ message: 'The book has been added' });
+  }
 });
 
 router.put('/:id', (req, res) => {
   const { id } = req.params;
   const body = req.body;
+  console.log(body);
   books.forEach((book, index) => {
     if (book.id === parseInt(id)) {
       books[index] = body;
