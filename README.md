@@ -1,5 +1,9 @@
 # Books Directory
 
+A Node.js practice project cloned from prabal-007/nodejs-books-directory.
+
+My goal is to develop a functioning REST API for a simple Books directory. The data source will be switched to a database and proper data validation will be implemented.
+
 ## Instructions
 
 1. Clone this repo
