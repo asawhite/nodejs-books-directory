@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const books = require('./books.json');
+const { Validator } = require("express-json-validator-middleware");
+const { validate } = new Validator();
+
+router.use(express.json());
 
 // Get all the books
 router.get('/', (req, res) => {

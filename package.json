@@ -4,7 +4,8 @@
   "description": "A practice project for REST APIs",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-json-validator-middleware": "^3.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
