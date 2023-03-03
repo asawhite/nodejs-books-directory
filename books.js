@@ -74,17 +74,28 @@ router.post('/', validateContentType, validate({ body: getSchema }), (req, res, 
 });
 
 // Update existing book
-router.put('/:id', validateContentType, (req, res) => {
+router.put('/:id', validateContentType, validate({ body: getSchema }), (req, res, next) => {
 	const { id } = req.params;
 	const body = req.body;
 	console.log(body);
-	books.forEach((book, index) => {
-		if (book.id === parseInt(id)) {
-			books[index] = body;
+
+	let index = books.findIndex(item => item.id === parseInt(id));
+
+	if (index === -1) {
+		res.json({ message: `No book with ID ${id} found` });
+		return next();
+	}
+
+	let book = books[index]
+	for (const key in body) {
+		if (Object.hasOwnProperty.call(book, key)) {
+			const value = body[key];
+			books[index][key] = value;
 		}
-	});
+	}
+
 	res.json({ message: `The book with ID ${id} has been updated` });
-	// res.json(books);
+	next();
 });
 
 router.delete('/:id', (req, res) => {
