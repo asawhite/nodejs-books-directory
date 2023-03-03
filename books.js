@@ -37,6 +37,21 @@ function validateContentType(req, res, next) {
 	}
 }
 
+// Validates book exists for PUT and DELETE requests
+function validateBookExists(req, res, next) {
+	const { id } = req.params;
+
+	let index = books.findIndex(item => item.id === parseInt(id));
+
+	if (index === -1) {
+		res.sendStatus(404);
+	} else {
+		req.bookId = id;
+		req.bookIndex = index;
+		return next();
+	}
+}
+
 // Modifies and returns schema based on request method
 function getSchema(req) {
 	let schema = bookSchema
@@ -76,19 +91,13 @@ router.post('/', validateContentType, validate({ body: getSchema }), (req, res, 
 });
 
 // Update existing book
-router.put('/:id', validateContentType, validate({ body: getSchema }), (req, res, next) => {
-	const { id } = req.params;
+router.put('/:id', validateContentType, validate({ body: getSchema }), validateBookExists, (req, res, next) => {
 	const body = req.body;
 	console.log(body);
 
-	let index = books.findIndex(item => item.id === parseInt(id));
+	let index = req.bookIndex;
+	let book = books[index];
 
-	if (index === -1) {
-		res.json({ message: `No book with ID ${id} found` });
-		return next();
-	}
-
-	let book = books[index]
 	for (const key in body) {
 		if (Object.hasOwnProperty.call(book, key)) {
 			const value = body[key];
@@ -96,24 +105,15 @@ router.put('/:id', validateContentType, validate({ body: getSchema }), (req, res
 		}
 	}
 
-	res.json({ message: `The book with ID ${id} has been updated` });
+	res.json({ message: `The book with ID ${req.bookId} has been updated` });
 	next();
 });
 
 // Delete book by id
-router.delete('/:id', (req, res) => {
-	const { id } = req.params;
+router.delete('/:id', validateBookExists, (req, res) => {
+	books.splice(req.bookIndex, 1);
 
-	let index = books.findIndex(item => item.id === parseInt(id));
-
-	if (index === -1) {
-		res.json({ message: `No book with ID ${id} found` });
-		return next();
-	}
-
-	books.splice(index, 1);
-
-	res.json({ message: `Book with id #${id} has been deleted` });
+	res.json({ message: `Book with id #${req.bookId} has been deleted` });
 });
 
 router.use(validationErrorMiddleware);
