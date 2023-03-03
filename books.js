@@ -28,6 +28,7 @@ function validationErrorMiddleware(error, req, res, next) {
 	next();
 }
 
+// Content type validation used by POST and PUT requests
 function validateContentType(req, res, next) {
 	if (!req.is('application/json')) {
 		res.sendStatus(415);
@@ -36,6 +37,7 @@ function validateContentType(req, res, next) {
 	}
 }
 
+// Modifies and returns schema based on request method
 function getSchema(req) {
 	let schema = bookSchema
 	if (req.method === "PUT") {
@@ -98,13 +100,19 @@ router.put('/:id', validateContentType, validate({ body: getSchema }), (req, res
 	next();
 });
 
+// Delete book by id
 router.delete('/:id', (req, res) => {
 	const { id } = req.params;
-	books.forEach((book, index) => {
-		if (book.id === parseInt(id)) {
-			books.splice(index);
-		}
-	});
+
+	let index = books.findIndex(item => item.id === parseInt(id));
+
+	if (index === -1) {
+		res.json({ message: `No book with ID ${id} found` });
+		return next();
+	}
+
+	books.splice(index, 1);
+
 	res.json({ message: `Book with id #${id} has been deleted` });
 });
 
