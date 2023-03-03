@@ -36,20 +36,33 @@ function validateContentType(req, res, next) {
 	}
 }
 
+function getSchema(req) {
+	let schema = bookSchema
+	if (req.method === "PUT") {
+		return schema
+	}
+
+	if (req.method === "POST") {
+		schema.required = ["name", "author"]
+		return schema
+	}
+}
+
 router.use(express.json());
 
-// Get all the books
+// Get all books
 router.get('/', (req, res) => {
 	res.json(books);
 });
 
-// Get a specific book
+// Get a book by id
 router.get('/:id', (req, res) => {
 	const { id } = req.params;
 	res.json(books.filter((ele) => ele.id === parseInt(id)));
 });
 
-router.post('/', validateContentType, validate({ body: bookSchema }), (req, res, next) => {
+// Post new book
+router.post('/', validateContentType, validate({ body: getSchema }), (req, res, next) => {
 	const data = req.body;
 	console.log(data);
 
@@ -60,7 +73,8 @@ router.post('/', validateContentType, validate({ body: bookSchema }), (req, res,
 	next();
 });
 
-router.put('/:id', (req, res) => {
+// Update existing book
+router.put('/:id', validateContentType, (req, res) => {
 	const { id } = req.params;
 	const body = req.body;
 	console.log(body);
