@@ -54,14 +54,13 @@ function validateBookExists(req, res, next) {
 
 // Modifies and returns schema based on request method
 function getSchema(req) {
-	let schema = bookSchema
 	if (req.method === "PUT") {
-		return schema
+		return bookSchema;
 	}
 
 	if (req.method === "POST") {
-		schema.required = ["name", "author"]
-		return schema
+		let schema = Object.assign({required: ["name", "author"]});
+		return schema;
 	}
 }
 
@@ -83,7 +82,7 @@ router.post('/', validateContentType, validate({ body: getSchema }), (req, res, 
 	const data = req.body;
 	console.log(data);
 
-	book = Object.assign({id: books.length + 1}, data);
+	let book = Object.assign({id: books.length + 1}, data);
 	books.push(book);
 	res.json({ message: 'The book has been added' });
 
